@@ -6,15 +6,17 @@ use Data::Dumper;
 use List::Util 'shuffle';
 use constant APPLICANTS => 20_000;
 use constant POSITIONS => 500;
-use constant CATEGORIES => 'A'..'B';
+use constant CATEGORIES => 'A'..'Z';
 
 
 my %categories=();
-my %stats=();
+my %stats_candidates=();
+my %stats_selected=();
 
 for my $category (CATEGORIES) {
   $categories{$category}=rand();
-  $stats{$category}=0;
+  $stats_candidates{$category}=0;
+  $stats_selected{$category}=0;
 }
 
 
@@ -30,6 +32,7 @@ for my $n (1..APPLICANTS) {
     
     if($dice<$categories{$category}) {
       $candidate->{$category}=1;
+      $stats_candidates{$category}++;
     } else {
       $candidate->{$category}=0;
     }
@@ -40,13 +43,13 @@ my @selected=pick(POSITIONS, @candidates);
 
 for my $winner (@selected) {
   for my $category (keys %$winner) {
-    $stats{$category}++ if $winner->{$category}==1;
+    $stats_selected{$category}++ if $winner->{$category}==1;
   }
 }
 
 
-for my $category (sort keys %stats) {
-  print "$category => ".($stats{$category}/POSITIONS)." (".$categories{$category}.")\n";
+for my $category (CATEGORIES) {
+  print "$category => ".$stats_selected{$category}/POSITIONS." (".$stats_candidates{$category}/APPLICANTS.")\n";
 }
 
 sub pick {
